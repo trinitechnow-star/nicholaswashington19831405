@@ -1,0 +1,6 @@
+{
+  "name": "Nexus AI Builder",
+  "description": "An AI-powered website builder SaaS platform that generates websites from prompts, templates, screenshots, or pasted URLs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
