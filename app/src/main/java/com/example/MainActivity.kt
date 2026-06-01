@@ -2039,8 +2039,8 @@ fun VisualEditorView(
                                     Text("Per-Query Cost Rate (USD):", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
                                     Text("This is billed dynamically per conversational step", color = TextMuted, fontSize = 8.sp)
                                     Slider(
-                                        value = voiceBotUsageRateState.toFloat(),
-                                        onValueChange = { voiceBotUsageRateState = Math.round(it * 100.0) / 100.0 },
+                                        value = voiceBotUsageRateState.toFloat().coerceIn(0.01f, 0.25f),
+                                        onValueChange = { voiceBotUsageRateState = (Math.round(it * 100.0) / 100.0).coerceIn(0.01, 0.25) },
                                         valueRange = 0.01f..0.25f,
                                         steps = 24,
                                         colors = SliderDefaults.colors(thumbColor = MintNeon, activeTrackColor = MintNeon)
