@@ -1761,6 +1761,14 @@ fun VisualEditorView(
     var windowsBinaryProductReady by remember { mutableStateOf(false) }
     var selectedTargetPlatformWin by remember { mutableStateOf("Win64 (.exe installer)") }
 
+    // Customizable Open-Source Windows App Options
+    var winAppOpenSourceLicense by remember { mutableStateOf("MIT License") }
+    var winAppOfflineCacheEnabled by remember { mutableStateOf(true) }
+    var winAppResizableFrame by remember { mutableStateOf(true) }
+    var winAppTargetArch by remember { mutableStateOf("x64 (AMD64)") }
+    var winAppVoicePermissionsEnabled by remember { mutableStateOf(true) }
+    var winAppSelectedCodeTab by remember { mutableStateOf("index.js") }
+
     // Script Copy state
     var isScriptCopiedByCode by remember { mutableStateOf(false) }
 
@@ -2248,7 +2256,7 @@ fun VisualEditorView(
                                 Text("Windows Standalone Build Porting Sandbox", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                             }
                             Text(
-                                text = "Compresses the conversational voicebot webpage assets directly into raw multiplatform Windows x64 binaries.",
+                                text = "Compresses the conversational voicebot webpage assets directly into raw distribution standalone Windows x64 binaries.",
                                 color = TextMuted,
                                 fontSize = 9.sp,
                                 modifier = Modifier.padding(vertical = 4.dp)
@@ -2256,6 +2264,7 @@ fun VisualEditorView(
 
                             Spacer(modifier = Modifier.height(10.dp))
 
+                            // 1. CHOOSE TARGET PLATFORM DISTRIBUTION
                             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                                 Text("Target Platform Distribution:", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                                 Row {
@@ -2284,10 +2293,136 @@ fun VisualEditorView(
 
                             Spacer(modifier = Modifier.height(10.dp))
 
+                            // 2. OPEN SOURCE LICENSE SELECTOR
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Text("Select Open Source License Protocol:", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    val licenses = listOf("MIT License", "GPL v3 License", "Apache 2.0")
+                                    licenses.forEach { lic ->
+                                        val isSelected = lic == winAppOpenSourceLicense
+                                        Surface(
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .clickable { winAppOpenSourceLicense = lic },
+                                            color = if (isSelected) DeepDark else SpaceSlate,
+                                            shape = RoundedCornerShape(4.dp),
+                                            border = BorderStroke(1.dp, if (isSelected) MintNeon else BorderColor)
+                                        ) {
+                                            Text(
+                                                text = lic,
+                                                color = if (isSelected) MintNeon else Color.White,
+                                                fontSize = 8.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                                modifier = Modifier.padding(vertical = 5.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            // 3. TARGET ARCHITECTURE
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Text("Target CPU Architecture Set:", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    val archs = listOf("x64 (AMD64)", "ia32 (x86)", "ARM64")
+                                    archs.forEach { arch ->
+                                        val isSelected = arch == winAppTargetArch
+                                        Surface(
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .clickable { winAppTargetArch = arch },
+                                            color = if (isSelected) DeepDark else SpaceSlate,
+                                            shape = RoundedCornerShape(4.dp),
+                                            border = BorderStroke(1.dp, if (isSelected) MintNeon else BorderColor)
+                                        ) {
+                                            Text(
+                                                text = arch,
+                                                color = if (isSelected) MintNeon else Color.White,
+                                                fontSize = 8.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                                modifier = Modifier.padding(vertical = 5.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            // 4. ADVANCED NATIVE COMPILER FLAGS
+                            Text("Advanced Open Source Compiler Configuration:", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = DeepDark),
+                                border = BorderStroke(1.dp, BorderColor)
+                            ) {
+                                Column(modifier = Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    // Switch 1: Offline Asset Caching Mode
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text("Offline Resource Caching:", color = Color.LightGray, fontSize = 9.sp, modifier = Modifier.weight(1f))
+                                        Row(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(4.dp))
+                                                .background(SpaceSlate)
+                                                .clickable { winAppOfflineCacheEnabled = !winAppOfflineCacheEnabled }
+                                        ) {
+                                            val label = if (winAppOfflineCacheEnabled) "Full Offline Sync ✅" else "Live Cloud Web 🌐"
+                                            val clr = if (winAppOfflineCacheEnabled) MintNeon else Color.LightGray
+                                            Text(text = label, color = clr, fontSize = 8.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp))
+                                        }
+                                    }
+
+                                    // Switch 2: Webcam and Audio Permission pre-approval
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text("Auto Grant Microphone APIs:", color = Color.LightGray, fontSize = 9.sp, modifier = Modifier.weight(1f))
+                                        Row(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(4.dp))
+                                                .background(SpaceSlate)
+                                                .clickable { winAppVoicePermissionsEnabled = !winAppVoicePermissionsEnabled }
+                                        ) {
+                                            val label = if (winAppVoicePermissionsEnabled) "Bypass Secure Sandbox 🛡️" else "Prompt App Prompts"
+                                            val clr = if (winAppVoicePermissionsEnabled) MintNeon else Color.LightGray
+                                            Text(text = label, color = clr, fontSize = 8.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp))
+                                        }
+                                    }
+
+                                    // Switch 3: Window Frame adjustable resize
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text("Window Resizable Frame Mode:", color = Color.LightGray, fontSize = 9.sp, modifier = Modifier.weight(1f))
+                                        Row(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(4.dp))
+                                                .background(SpaceSlate)
+                                                .clickable { winAppResizableFrame = !winAppResizableFrame }
+                                        ) {
+                                            val label = if (winAppResizableFrame) "Resizable Desktop App Window 🗖" else "Fixed Kiosk Frame Mode 🔒"
+                                            val clr = if (winAppResizableFrame) MintNeon else Color.LightGray
+                                            Text(text = label, color = clr, fontSize = 8.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp))
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
                             // Action button
                             if (isBuildingWindowsExe) {
                                 Column(modifier = Modifier.fillMaxWidth()) {
-                                    Text("Compiling native win32 assets with integrated Chromium context...", color = MintNeon, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+                                    Text("Compiling native windows installer with open source configuration wrapper...", color = MintNeon, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
                                     Spacer(modifier = Modifier.height(4.dp))
                                     LinearProgressIndicator(
                                         progress = { windowsBuildProgress },
@@ -2307,13 +2442,16 @@ fun VisualEditorView(
                                         
                                         coroutineScope.launch {
                                             kotlinx.coroutines.delay(600)
-                                            windowsBuildTerminalLines.add("> transpile_compose_multitarget -win64 -bundled_agent")
+                                            windowsBuildTerminalLines.add("> transpile_compose_multitarget -win64 -bundled_agent -arch $winAppTargetArch")
+                                            windowsBuildTerminalLines.add("> License Protocol: $winAppOpenSourceLicense [Mitigating validation gates]")
                                             windowsBuildProgress = 0.25f
                                             kotlinx.coroutines.delay(600)
-                                            windowsBuildTerminalLines.add("> Embedding Conversational script header triggers...")
+                                            windowsBuildTerminalLines.add("> Local offline packaging sync mode: ${if (winAppOfflineCacheEnabled) "EMBEDDED ACTIVE" else "STREAM BRIDGE"}")
+                                            windowsBuildTerminalLines.add("> Injecting secure mic hardware trigger headers...")
                                             windowsBuildProgress = 0.5f
                                             kotlinx.coroutines.delay(600)
                                             windowsBuildTerminalLines.add("> Linking trinitech_debug_windows_signature.cert ...")
+                                            windowsBuildTerminalLines.add("> Executing Electron Builder compiler package.json scripts...")
                                             windowsBuildProgress = 0.75f
                                             kotlinx.coroutines.delay(600)
                                             windowsBuildTerminalLines.add("> COMPILATION COMPLETED. Output generated: build/dist/StandaloneDesktop_Setup.exe")
@@ -2337,7 +2475,7 @@ fun VisualEditorView(
                             Spacer(modifier = Modifier.height(8.dp))
                             Text("💻 Builder Sandboxed Terminal Console Output:", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                             Surface(
-                                modifier = Modifier.fillMaxWidth().height(110.dp),
+                                modifier = Modifier.fillMaxWidth().height(115.dp),
                                 color = Color.Black,
                                 shape = RoundedCornerShape(6.dp),
                                 border = BorderStroke(1.dp, BorderColor)
@@ -2348,7 +2486,7 @@ fun VisualEditorView(
                                 ) {
                                     if (windowsBuildTerminalLines.isEmpty()) {
                                         item {
-                                            Text("> Idle. Initiate compiler sandbox above to run Windows packaging workflow.", color = Color.Gray, fontFamily = FontFamily.Monospace, fontSize = 9.sp)
+                                            Text("> Ready. Configure settings and click compile above to sandbox-pack your Windows exe.", color = Color.Gray, fontFamily = FontFamily.Monospace, fontSize = 9.sp)
                                         }
                                     } else {
                                         items(windowsBuildTerminalLines) { line ->
@@ -2370,6 +2508,198 @@ fun VisualEditorView(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Text("📥 Download Windows Standalone EXE ZIP Package (17.4 MB)", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                                }
+                            }
+
+                            // 5. OPEN SOURCE REPOSITORY ASSETS CODE INSPECTOR (THE WORKABLE OPEN SOURCE SOURCE CORE)
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text("📂 Open Source Repository Files (Editable & Interactive):", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = CardDefaults.cardColors(containerColor = DeepDark),
+                                border = BorderStroke(1.dp, BorderColor)
+                            ) {
+                                Column(modifier = Modifier.padding(8.dp)) {
+                                    // Row tabs
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(2.dp)
+                                    ) {
+                                        val codeTabs = listOf("index.js", "package.json", "windows-build.yml", "README.md")
+                                        codeTabs.forEach { tab ->
+                                            val isTabSelected = tab == winAppSelectedCodeTab
+                                            Surface(
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .clickable { winAppSelectedCodeTab = tab },
+                                                color = if (isTabSelected) SpaceSlate else Color.Transparent,
+                                                shape = RoundedCornerShape(4.dp)
+                                            ) {
+                                                Text(
+                                                    text = tab,
+                                                    color = if (isTabSelected) MintNeon else Color.LightGray,
+                                                    fontSize = 8.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                                    modifier = Modifier.padding(vertical = 4.dp)
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(6.dp))
+
+                                    // Code Body Text computing based on states
+                                    val localClipboard = androidx.compose.ui.platform.LocalClipboardManager.current
+                                    val currentCodeBodyText = when (winAppSelectedCodeTab) {
+                                        "index.js" -> {
+                                            "// Open-Source Standalone Desktop Wrapper for Windows\n" +
+                                            "// License: $winAppOpenSourceLicense\n" +
+                                            "// Generated dynamically by Nexus AI Builder for ${selectedWebSite.name}\n\n" +
+                                            "const { app, BrowserWindow, session, ipcMain } = require('electron');\n" +
+                                            "const path = require('path');\n" +
+                                            "const fs = require('fs');\n\n" +
+                                            "let mainWindow;\n\n" +
+                                            "function createLauncherWindow() {\n" +
+                                            "  mainWindow = new BrowserWindow({\n" +
+                                            "    width: 1280,\n" +
+                                            "    height: 720,\n" +
+                                            "    resizable: $winAppResizableFrame,\n" +
+                                            "    title: \"${selectedWebSite.name} Standalone Windows Client\",\n" +
+                                            "    webPreferences: {\n" +
+                                            "      nodeIntegration: false,\n" +
+                                            "      contextIsolation: true,\n" +
+                                            "      sandbox: true,\n" +
+                                            "      preload: path.join(__dirname, 'preload.js')\n" +
+                                            "    }\n" +
+                                            "  });\n\n" +
+                                            "  // Security permissions setup for Microphone access\n" +
+                                            "  " + (if (winAppVoicePermissionsEnabled) {
+                                                "session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {\n" +
+                                                "    if (permission === 'media') {\n" +
+                                                "      console.log('[Security Sandbox] Auto-granted voice recording & synthesis APIs!');\n" +
+                                                "      return callback(true);\n" +
+                                                "    }\n" +
+                                                "    callback(false);\n" +
+                                                "  });"
+                                            } else {
+                                                "// Standard browser runtime permission prompts enabled"
+                                            }) + "\n\n" +
+                                            "  // Local SQLite/Index Caching configurations\n" +
+                                            "  " + (if (winAppOfflineCacheEnabled) {
+                                                "session.defaultSession.webRequest.onBeforeRequest((details, callback) => {\n" +
+                                                "    if (details.url.includes(\"assets/\")) {\n" +
+                                                "      console.log('[Local Offline Packager] Serving cached package asset natively');\n" +
+                                                "    }\n" +
+                                                "    callback({ cancel: false });\n" +
+                                                "  });"
+                                            } else {
+                                                "// Configured in stream proxy mode without local cache storage"
+                                            }) + "\n\n" +
+                                            "  // Load target web applet frame URL\n" +
+                                            "  mainWindow.loadURL('https://${selectedWebSite.name.lowercase().replace(" ", "")}.nexus.site/app/windows-env');\n" +
+                                            "}\n\n" +
+                                            "app.whenReady().then(createLauncherWindow);"
+                                        }
+                                        "package.json" -> {
+                                            "{\n" +
+                                            "  \"name\": \"${selectedWebSite.name.lowercase().replace(" ", "-")}-desktop-app\",\n" +
+                                            "  \"version\": \"1.0.0\",\n" +
+                                            "  \"description\": \"Licensed under the $winAppOpenSourceLicense. Native Windows container for ${selectedWebSite.name}.\",\n" +
+                                            "  \"main\": \"index.js\",\n" +
+                                            "  \"license\": \"${if (winAppOpenSourceLicense.contains("GPL")) "GPL-3.0" else if (winAppOpenSourceLicense.contains("Apache")) "Apache-2.0" else "MIT"}\",\n" +
+                                            "  \"scripts\": {\n" +
+                                            "    \"start\": \"electron .\",\n" +
+                                            "    \"compile-win\": \"electron-packager . ${selectedWebSite.name} --platform=win32 --arch=${winAppTargetArch.substringBefore(" ").lowercase()} --out=dist/ --overwrite\"\n" +
+                                            "  },\n" +
+                                            "  \"devDependencies\": {\n" +
+                                            "    \"electron\": \"^28.2.0\",\n" +
+                                            "    \"electron-packager\": \"^17.1.1\"\n" +
+                                            "  }\n" +
+                                            "}"
+                                        }
+                                        "windows-build.yml" -> {
+                                            "name: Build Stable Open Source Windows Distribution\n\n" +
+                                            "on:\n" +
+                                            "  push:\n" +
+                                            "    branches: [ main ]\n\n" +
+                                            "jobs:\n" +
+                                            "  build-setup-exe:\n" +
+                                            "    runs-on: windows-latest\n" +
+                                            "    steps:\n" +
+                                            "      - name: Fetch repository source code\n" +
+                                            "        uses: actions/checkout@v3\n\n" +
+                                            "      - name: Setup Node.js v18 LTS environmental core\n" +
+                                            "        uses: actions/setup-node@v3\n" +
+                                            "        with:\n" +
+                                            "          node-version: 18\n\n" +
+                                            "      - name: Install local package dependencies\n" +
+                                            "        run: npm ci\n\n" +
+                                            "      - name: Build standalone Windows executable container (${winAppTargetArch.substringBefore(" ")})\n" +
+                                            "        run: npm run compile-win\n\n" +
+                                            "      - name: Package production zip release artifact\n" +
+                                            "        run: |\n" +
+                                            "          compress-archive -path dist/* -destinationpath dist/production-windows-amd64.zip\n\n" +
+                                            "      - name: Upload compiled Windows standalone package\n" +
+                                            "        uses: actions/upload-artifact@v3\n" +
+                                            "        with:\n" +
+                                            "          name: production-windows-${winAppTargetArch.substringBefore(" ").lowercase()}\n" +
+                                            "          path: dist/production-windows-amd64.zip"
+                                        }
+                                        else -> { // README.md
+                                            "# ${selectedWebSite.name} Windows Standalone Client\n\n" +
+                                            "This is a native Windows app wrapper porting sandbox compiled natively for **$winAppTargetArch**.\n" +
+                                            "It integrates conversational voicebots, dynamic webpage resources, and audio synthesis triggers directly.\n\n" +
+                                            "## Open Source License Model\n" +
+                                            "This repository is released under the **$winAppOpenSourceLicense** model. Feel free to modify, fork, or resell standalone distribution units without any upstream validation.\n\n" +
+                                            "## System Properties Installed:\n" +
+                                            "- **Offline Resource Caching:** ${if (winAppOfflineCacheEnabled) "Active Local Buffering" else "Live Cloud Proxy Mode"}\n" +
+                                            "- **Auto Sandbox Microphone Bypass:** ${if (winAppVoicePermissionsEnabled) "Enabled (Secure WebAPI)" else "Disabled"}\n" +
+                                            "- **Window Dimension Mode:** ${if (winAppResizableFrame) "Resizable Frame" else "Locked Kiosk Kiosk Mode"}\n\n" +
+                                            "## Build Setup Guide\n" +
+                                            "1. Run `npm install` inside root directory\n" +
+                                            "2. Test wrapper frame in electron workspace via `npm start`\n" +
+                                            "3. Build signed setup executables via `npm run compile-win`"
+                                        }
+                                    }
+
+                                    Surface(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(130.dp),
+                                        color = Color.Black,
+                                        shape = RoundedCornerShape(4.dp),
+                                        border = BorderStroke(1.dp, Color.DarkGray)
+                                    ) {
+                                        LazyColumn(modifier = Modifier.padding(6.dp)) {
+                                            item {
+                                                Text(
+                                                    text = currentCodeBodyText,
+                                                    color = Color(0xFFA5D6A7),
+                                                    fontFamily = FontFamily.Monospace,
+                                                    fontSize = 8.sp,
+                                                    lineHeight = 10.sp
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(6.dp))
+
+                                    Button(
+                                        onClick = {
+                                            localClipboard.setText(androidx.compose.ui.text.AnnotatedString(currentCodeBodyText))
+                                            Toast.makeText(context, "🗒️ Copied open-source file: $winAppSelectedCodeTab to developer buffer!", Toast.LENGTH_SHORT).show()
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = SpaceSlate),
+                                        border = BorderStroke(1.dp, MintNeon),
+                                        shape = RoundedCornerShape(4.dp),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text("📋 Copy Open-Source $winAppSelectedCodeTab Script", color = MintNeon, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                    }
                                 }
                             }
 
@@ -2606,10 +2936,12 @@ fun VisualEditorView(
                                                         ccActionTerminalLines.add("[CI/CD Runner] npm install -g electron-packager electron-installer-windows")
                                                         ccActionProgress = 0.5f
                                                         kotlinx.coroutines.delay(600)
-                                                        ccActionTerminalLines.add("[CI/CD Runner] Compiling standalone Win64 binary distribution setup package...")
+                                                        ccActionTerminalLines.add("[CI/CD Runner] Compiling open-source [$winAppOpenSourceLicense] Windows distribution wrapper...")
+                                                        ccActionTerminalLines.add("[CI/CD Runner] Packing binaries targeting custom architecture: [$winAppTargetArch]...")
+                                                        ccActionTerminalLines.add("[CI/CD Runner] Offline caching mode: ${if (winAppOfflineCacheEnabled) "ENABLED" else "DISABLED"}")
                                                         ccActionProgress = 0.75f
                                                         kotlinx.coroutines.delay(600)
-                                                        ccActionTerminalLines.add("[CI/CD Runner] Binary compiled and signed. Releasing artifact 'production-windows-amd64.zip'!")
+                                                        ccActionTerminalLines.add("[CI/CD Runner] Standalone binary compiled. Releasing open-source artifact: production-windows-${winAppTargetArch.substringBefore(" ").lowercase()}.zip")
                                                         ccActionProgress = 1.0f
                                                         ccReleasePackageReady = true
                                                         isCcActionRunning = false
@@ -4263,16 +4595,18 @@ fun SandboxAndComplianceView(
                     shape = RoundedCornerShape(8.dp),
                     border = BorderStroke(1.dp, BorderColor)
                 ) {
-                    LazyColumn(modifier = Modifier.padding(8.dp)) {
-                        item {
-                            Text(
-                                text = apiResponse,
-                                color = Color.Green,
-                                fontFamily = FontFamily.Monospace,
-                                fontSize = 10.sp,
-                                lineHeight = 13.sp
-                            )
-                        }
+                    Column(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        Text(
+                            text = apiResponse,
+                            color = Color.Green,
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 10.sp,
+                            lineHeight = 13.sp
+                        )
                     }
                 }
             }
